@@ -1,0 +1,39 @@
+Logic unit (LU) performs 1-bit operations.
+
+Data single-bit I/O line feeds into the Logic unit (LU),
+which implements 1-bit Boolean logic functions such as AND and OR.
+The result is stored in the Result Register (RR).
+
+Instruction Register stores the 4-bit instruction.
+
+
+INPUT		|	OPERATION
+----------------+------------------------------------------------------------
+RR	DATA	|	LD	LDC	AND	ANDC	OR	ORC	XNOR
+0	0	|	0	1	0	0	0	1	1
+0	1	|	1	0	0	0	1	0	0
+1	0	|	0	1	0	1	1	1	0
+1	1	|	1	0	1	0	1	1	1
+
+
+Instruction set
+
+0000	NOPO	No change in registers. Set Flag O to 1.
+0001	LD	Load result register		D -> R
+0010	LDC	Load complement to register	~D -> R
+0011	AND	Logical AND			D & R -> R
+0100	ANDC	Complement AND			~D & R -> R
+0101	OR	Logical OR			D | R -> R
+0110	ORC	Complement OR			~D | R -> R
+0111	XNOR	Exclusive NOR			~(D ^ R) -> R
+1000	STO	Store				R -> D
+1001	STOC	Store complement		~R -> D
+1010	IEN	Input enable			In -> R
+1011	OEN	Ouput enable			R -> Out
+1100	JMP	Jump				JMP Flag -> ⎍ 
+1101	RTN	Skip the next instruction	RTN Flag -> ⎍
+1110	SKZ	Skip the next instruction if R = 0
+1111	NOPF	No change in registers. Set Flag F to 1.
+
+input:		data in, i0, i1, i2, i3, IEN
+output:		data out, write, skip, O, F, RTN, JMP, OEN
