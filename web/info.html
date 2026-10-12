@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1bICS</title>
+<base target="_blank">
+
+<style>
+
+body {
+  margin: auto;
+  max-width: 800px;
+  padding: 10px;
+  font-family: Verdana;
+}
+
+img {
+  display: block;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+pre {
+  background-color: #eeeeee;
+  display: block;
+}
+
+table {
+	border-collapse: collapse;
+	font-family: monospace;
+}
+
+td, th {
+	border: 1px solid;
+	text-align: left;
+	padding: 8px;
+}
+
+</style>
+
+<small>Updated 11 October 2026</small>
+
+<h2>1bICS</h2>
+<p>The 1-bit Industrial Control System (pronounced as "one-bicks") is a
+single-bit processor designed for use in systems requiring decisions based on
+sequence of single-bit information. The design is directly based on the
+<a href="https://datasheets.chipdb.org/Motorola/MC14500B/Datasheet%20.pdf">
+MC14500B</a> CMOS microprocessor from Motorola.</p>
+
+<p>It has a remarkably low transistor count, with my current iteration
+of the design requiring only ~250-300 discrete transistors for the entire chip,
+which I have physically built and documented the results of in this post. In
+comparison, even the first microprocessor the 4-bit Intel 4004 (1971)
+contained about 2250 transistors.</p>
+
+<a href="https://youtu.be/XzcfRha6oNQ">
+<img src="https://i.imgur.com/71iZd8F.jpeg"/></a>
+<p><i>The image of the board above is the complete Logic Unit, using
+Manhattan circuit construction technique.</i></p>
+
+<p>The chip has an unusual architecture, hosting only a 1-bit data bus
+and a 4-bit instruction set. It doesn't include any support for features that
+a typical microprocessor has. The program counter, instruction fetches,
+memory, jumps and subroutine calls will need to be implemented with external
+circuitry.</p>
+
+<table>
+	<tr>
+		<td>Instruction Code</td>
+		<td>Mnemonic</td>
+		<td>Action</td>
+	</tr>
+	<tr>
+		<td>0 0000</td>
+		<td>NOPO</td>
+		<td>RR → RR, Flag O → HIGH</td>
+	</tr>
+	<tr>
+		<td>1 0001</td>
+		<td>LD</td>
+		<td>Data → RR</td>
+	</tr>
+	<tr>
+		<td>2 0010</td>
+		<td>LDC</td>
+		<td>!Data → RR</td>
+	</tr>
+	<tr>
+		<td>3 0011</td>
+		<td>AND</td>
+		<td>RR & Data → RR</td>
+	</tr>
+	<tr>
+		<td>4 0100</td>
+		<td>ANDC</td>
+		<td>RR & !Data → RR</td>
+	</tr>
+	<tr>
+		<td>5 0101</td>
+		<td>OR</td>
+		<td>RR | Data → RR</td>
+	</tr>
+	<tr>
+		<td>6 0110</td>
+		<td>ORC</td>
+		<td>RR | !Data → RR</td>
+	</tr>
+	<tr>
+		<td>7 0111</td>
+		<td>XNOR</td>
+		<td>!(RR ^ Data) → RR</td>
+	</tr>
+	<tr>
+		<td>8 1000</td>
+		<td>STO</td>
+		<td>RR → Data, Write → HIGH</td>
+	</tr>
+	<tr>
+		<td>9 1001</td>
+		<td>STOC</td>
+		<td>!RR → Data, Write → HIGH</td>
+	</tr>
+	<tr>
+		<td>A 1010</td>
+		<td>IEN</td>
+		<td>Data → IEN</td>
+	</tr>
+	<tr>
+		<td>B 1011</td>
+		<td>OEN</td>
+		<td>Data → OEN</td>
+	</tr>
+	<tr>
+		<td>C 1100</td>
+		<td>JMP</td>
+		<td>JMP Flag → HIGH</td>
+	</tr>
+	<tr>
+		<td>D 1101</td>
+		<td>RTN</td>
+		<td>RTN Flag → HIGH, and skip next instruction</td>
+	</tr>
+	<tr>
+		<td>E 1110</td>
+		<td>SKZ</td>
+		<td>Skip next instruction if RR = 0</td>
+	</tr>
+	<tr>
+		<td>F 1111</td>
+		<td>NOPF</td>
+		<td>RR → RR, Flag F → HIGH</td>
+	</tr>
+</table>
+
+<p>With the use of a rudimentary assembler and access to sufficent memory,
+the processor proves itself to be more than capable of performing complex
+computational tasks.</p>
+
+<p>The example below shows a basic arithmetic subroutine performing a 4-bit
+addition.</p>
+
+<h4>Assembly code:</h4>
+<pre><code>	; enable data input/output
+0x00:	IEN HIGH
+0x02:	OEN HIGH
+
+0x04:	JMP 0x20	; goto main code
+
+	; FULL-ADDER SUBROUTINE
+0x06:	LD   A
+0x08:	XNOR B
+0x0A:	STOC A_XOR_B	; store A ^ B
+
+0x0C:	LD   A
+0x0E:	AND  B
+0x10:	STO  A_AND_B	; store A & B
+
+0x12:	LD   A_XOR_B
+0x14:	XNOR C
+0x16:	STOC B		; S = (A ^ B) ^ C
+
+0x18:	LD   A_XOR_B
+0x1A:	AND  C
+0x1C:	OR   A_AND_B
+0x1E:	STO  C		; C = ((A ^ B) & C) | (A & B)
+
+0x20:	RTN  0		; exit
+
+	; z0 = x0 + y0
+0x22:	LD   X0		; load x0 as 1st argument
+0x24:	STO  A
+0x26:	LD   Y0		; load y0 as 2nd argument
+0x28:	STO  B
+0x2A:	JMP  0x04	; call to subroutine
+0x2C:	LD   B
+0x2E:	STO  Z0		; store result to z0
+
+	; z1 = x1 + y1 + c
+0x30:	LD   X1
+0x32:	STO  A
+0x34:	LD   Y1
+0x36:	STO  B		; carry is stored from
+0x38:	JMP  0x04	; previous subroutine call
+0x3A:	LD   B
+0x3C:	STO  Z1
+
+	; z2 = x2 + y2 + c
+0x3E:	LD   X2
+0x40:	STO  A
+0x42:	LD   Y2
+0x44:	STO  B
+0x46:	JMP  0x04
+0x48:	LD   B
+0x4A:	STO  Z2
+
+	; z3 = x3 + y3 + c
+0x4C:	LD   X3
+0x4E:	STO  A
+0x50:	LD   Y3
+0x52:	STO  B
+0x54:	JMP  0x04
+0x56:	LD   B
+0x58:	STO  Z3
+</code></pre>
+
+<h4>Memory dump:</h4>
+<pre><code>0x00:   0100000000000000
+0x10:   0100000000000000
+0x20:   0000000000000000
+0x30:   1110000000000000
+0x40:   0100000000000000
+0x50:   1001000000000000
+0x60:   0000000000000000
+0x70:   0000000000000000
+0x80:   0000000000000000
+0x90:   0000000000000000
+0xA0:   0000000000000000
+0xB0:   0000000000000000
+0xC0:   0000000000000000
+0xD0:   0000000000000000
+0xE0:   0000000000000000
+0xF0:   0000000000000000
+</code></pre>
+
+<p>Memory address <code>0x30</code> holds the first value
+(<code>0b0111</code>), and <code>0x40</code> for the second value
+(<code>0b0010</code>). The result of this addition is stored at
+<code>0x50</code> with the output <code>0b1001</code>, which agrees
+with the fact that <code>0b0111 + 0b0010 = 0b1001</code> and assures that
+the program is running as expected.</p>
+
+<p>For a more detailed discription of how such a microprocessor works,
+visit Ken Shirriff's excellent blog post: <a href=
+"https://www.righto.com/2021/02/a-one-bit-processor-explained-reverse.html">
+"A one-bit processor explained: reverse-engineering the vintage MC14500B"</a>
+</p>
+
+<br>
+
+<h3>Project History</h3>
+
+<p>I have first started out this project with the goal of fully building a
+computer from discrete electronic components (no integrated circuits). Being
+terribly unmotivated to follow any courses or guides, I begain working with
+digial logic circuitry (NAND, NOR, NOT, etc.) one unit at a time. From
+registers to counters to arithmetic units, it became increasily apparent to
+me the time and financial cost required to build a homebrew computer was much
+too great for the resources I had avaliable to me.</p>
+
+<p>Thus, I begin the process of extreme pruning, learning about the history of
+computing and what one can get away with. Even with a complex ALU, the biggest
+offender to the cost of computing was usually always memory.</p>
+
+<p>Let's say, if one <i>bit</i> (not byte!) of memory requires 5 transistors,
+and I desire a full 256 bytes of RAM. And each 2N2222 transistor costs around $0.08... I
+would require a whopping 10,240 transistors. That's $819.20 in transistors
+alone! And that's not including all the resistors required to make it work, nor
+the decoder that's required to make it addressable! Don't forget all the labour,
+time, and soldering too!</p>
+
+<p>If we insist on using only discrete electronic components, we would have to
+be very selective and reserved with our use of transistors.</p>
+
+<a href="https://youtu.be/wS3LNuDqMMI">
+<img src="https://i.imgur.com/5sNYW0I.jpeg"/></a>
+<p><i>Discrete transistorised version of the 4-bit instruction register</i></p>
+
+<p>To make things "work" I had to reduce the scope down to the CPU. Even then, a
+basic 8-bit ALU would still require hundreds of transistors at the very least. This
+has forced me to rethink things even more until I came across 1-bit
+microprocessor designs, where the ALU (or the Logic Unit in this case) only
+required 35-40 or so transistors! Amazing!</p>
+
+<p>With a small 4-bit instruction set and a couple of 1-bit registers, this
+discovery made the project a lot more feasable within the time span and
+finances I had to work with.</p>
+
+<img src="https://i.imgur.com/cHHV5MG.png"/>
+<p><i>A fully working simulation of 1bICS I made on Digital Logic Sim (Sebastian Lague)</i></p>
+
+<p>Once I got the logical aspects of the chip working, I began to learn more
+about digital electronics and schematic design. Prototying units using
+electronic simulations and then breadboards, incremenally piecing parts
+togethers such that they work in predicable and synchronous manner.</p>
+
+<p>Clicking on some of the pictures above will lead you to the vidoes
+of the circuits working in action. I certainly could have made some
+optimisations in the design, utilising electronic "trickery", and saved a
+transistor here or there, but at some point the concept of "good enough"
+applies.</p>
+
+<ul>
+	<li>
+		<a href="https://youtu.be/XzcfRha6oNQ">
+			Video 1: Logic Unit
+		</a>
+	</li>
+	<li>
+		<a href="https://youtu.be/wS3LNuDqMMI">
+			Video 2: Instruction Register
+		</a>
+	</li>
+</ul>
+
+<a href="https://github.com/okforth/1bICU">
+<img src="https://i.imgur.com/Xqj8OmP.png"/></a>
+
+<p>This project has been an overall success, and it has achieved the goals I
+have set out to do. However, I have yet to finish building all the circuits as it is now apprent to me that manual prototyping methods can be
+incredibly time consuming. So far every ciruit has worked exactly as I expected,
+thus I will make to move to create PCB designs and get them printed in the
+future.</p>
+
+<br>
+
+<p><center><small>Many thanks for reading!</small></center></p>
+
+<br>
