@@ -53,13 +53,16 @@ which I have physically built and documented the results of in this post. In
 comparison, even the first microprocessor the 4-bit Intel 4004 (1971)
 contained about 2250 transistors.</p>
 
+<p><a href="https://github.com/okforth/1bICU">
+Link to my GitHub Repository</a></p>
+
 <a href="https://youtu.be/XzcfRha6oNQ">
 <img src="https://i.imgur.com/71iZd8F.jpeg"/></a>
 <p><i>The image of the board above is the complete Logic Unit, using
 Manhattan circuit construction technique.</i></p>
 
 <p>The chip has an unusual architecture, hosting only a 1-bit data bus
-and a 4-bit instruction set. It doesn't include any support for features that
+and a 4-bit instruction set. It does not include any support for features that
 a typical microprocessor has. The program counter, instruction fetches,
 memory, jumps and subroutine calls will need to be implemented with external
 circuitry.</p>
@@ -152,7 +155,7 @@ circuitry.</p>
 	</tr>
 </table>
 
-<p>With the use of a rudimentary assembler and access to sufficent memory,
+<p>With the use of a rudimentary assembler and access to sufficient memory,
 the processor proves itself to be more than capable of performing complex
 computational tasks.</p>
 
@@ -249,7 +252,7 @@ addition.</p>
 with the fact that <code>0b0111 + 0b0010 = 0b1001</code> and assures that
 the program is running as expected.</p>
 
-<p>For a more detailed discription of how such a microprocessor works,
+<p>For a more detailed description of how such a microprocessor works,
 visit Ken Shirriff's excellent blog post: <a href=
 "https://www.righto.com/2021/02/a-one-bit-processor-explained-reverse.html">
 "A one-bit processor explained: reverse-engineering the vintage MC14500B"</a>
@@ -261,20 +264,21 @@ visit Ken Shirriff's excellent blog post: <a href=
 
 <p>I have first started out this project with the goal of fully building a
 computer from discrete electronic components (no integrated circuits). Being
-terribly unmotivated to follow any courses or guides, I begain working with
-digial logic circuitry (NAND, NOR, NOT, etc.) one unit at a time. From
-registers to counters to arithmetic units, it became increasily apparent to
+terribly unmotivated to follow any courses or guides, I began working with
+digital logic circuitry (NAND, NOR, NOT, etc.) one unit at a time. From
+registers to counters to arithmetic units, it became increasingly apparent to
 me the time and financial cost required to build a homebrew computer was much
-too great for the resources I had avaliable to me.</p>
+too great for the resources I had available to me.</p>
 
 <p>Thus, I begin the process of extreme pruning, learning about the history of
-computing and what one can get away with. Even with a complex ALU, the biggest
-offender to the cost of computing was usually always memory.</p>
+computing and the creative solutions people came up with. Even with a complex
+ALU, the biggest offender to the cost of computing was usually always memory.
+</p>
 
 <p>Let's say, if one <i>bit</i> (not byte!) of memory requires 5 transistors,
-and I desire a full 256 bytes of RAM. And each 2N2222 transistor costs around $0.08... I
+and I desire a full 256 bytes of RAM, and each 2N2222 transistor costs around $0.08... I
 would require a whopping 10,240 transistors. That's $819.20 in transistors
-alone! And that's not including all the resistors required to make it work, nor
+alone! That is not including all the resistors required to make it work, nor
 the decoder that's required to make it addressable! Don't forget all the labour,
 time, and soldering too!</p>
 
@@ -285,14 +289,14 @@ be very selective and reserved with our use of transistors.</p>
 <img src="https://i.imgur.com/5sNYW0I.jpeg"/></a>
 <p><i>Discrete transistorised version of the 4-bit instruction register</i></p>
 
-<p>To make things "work" I had to reduce the scope down to the CPU. Even then, a
-basic 8-bit ALU would still require hundreds of transistors at the very least. This
-has forced me to rethink things even more until I came across 1-bit
-microprocessor designs, where the ALU (or the Logic Unit in this case) only
-required 35-40 or so transistors! Amazing!</p>
+<p>To make the project more approachable, I had to reduce the scope down to
+the CPU. Even then, a basic 8-bit ALU would still require hundreds of
+transistors. This has forced me to continue searching until I came
+across 1-bit microprocessor designs, where the ALU (or the Logic Unit in this
+case) only required 35-40 or so transistors!</p>
 
 <p>With a small 4-bit instruction set and a couple of 1-bit registers, this
-discovery made the project a lot more feasable within the time span and
+discovery made the project a lot more feasible within the time span and
 finances I had to work with.</p>
 
 <img src="https://i.imgur.com/cHHV5MG.png"/>
@@ -300,12 +304,12 @@ finances I had to work with.</p>
 
 <p>Once I got the logical aspects of the chip working, I began to learn more
 about digital electronics and schematic design. Prototying units using
-electronic simulations and then breadboards, incremenally piecing parts
-togethers such that they work in predicable and synchronous manner.</p>
+electronic simulations and then breadboards, incrementally piecing parts
+together such that they work in predictable and synchronous manner.</p>
 
-<p>Clicking on some of the pictures above will lead you to the vidoes
+<p>Clicking on some of the pictures above will lead you to the videos
 of the circuits working in action. I certainly could have made some
-optimisations in the design, utilising electronic "trickery", and saved a
+optimisations in the design, by utilising electronic "trickery" to save a
 transistor here or there, but at some point the concept of "good enough"
 applies.</p>
 
@@ -326,11 +330,10 @@ applies.</p>
 <img src="https://i.imgur.com/Xqj8OmP.png"/></a>
 
 <p>This project has been an overall success, and it has achieved the goals I
-have set out to do. However, I have yet to finish building all the circuits as it is now apprent to me that manual prototyping methods can be
-incredibly time consuming. So far every ciruit has worked exactly as I expected,
-thus I will make to move to create PCB designs and get them printed in the
-future.</p>
-
+have set out to do. However, not all of the circuits were fully built as it is
+now apparent to me that manual prototyping methods can be incredibly time
+consuming. So far, every circuit has behaved exactly as I expected, thus I will
+make the move to create PCB designs and get them printed in the future.</p>
 <br>
 
 <p><center><small>Many thanks for reading!</small></center></p>
