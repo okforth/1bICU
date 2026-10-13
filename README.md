@@ -7,5 +7,3 @@ It has a remarkably low transistor count, with my current iteration of the desig
 [Read more about it on my blog post](https://okforth.github.io/1bics)
 
 ![Discrete transistorised version of the Logic Unit circuit](https://i.imgur.com/71iZd8F.jpeg)
-
-:)
